@@ -1,248 +1,178 @@
 # PayChangu Flutter SDK
 
-A Flutter SDK for integrating PayChangu payment gateway into your Flutter applications. This SDK provides a simple and secure way to accept payments through various payment methods including Airtel Money, TNM Mpamba, and card payments in Malawi.
+Flutter/Dart client for [PayChangu](https://developer.paychangu.com) — accept payments in Malawi (hosted checkout, mobile money, bank transfer, cards), send payouts, pay bills, and use Connect / US virtual accounts.
 
-[![pub package](https://img.shields.io/pub/v/paychangu_flutter.svg)](https://pub.dev/packages/paychangu_flutter)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+**Current version:** `1.0.0`  
+**API docs:** [developer.paychangu.com](https://developer.paychangu.com/reference/introduction)
 
-## Features
-
-- 🔒 Secure payment processing
-- 💳 Multiple payment method support
-- 🌐 WebView-based checkout experience
-- ✨ Simple integration
-- 🔄 Real-time payment status updates
-- ⚡ Asynchronous payment handling
-- 🛠️ Customizable UI elements
-- ✅ Transaction verification
-
-## Getting Started
-
-### Prerequisites
-
-- Flutter SDK
-- PayChangu merchant account and API credentials
-- Minimum Flutter version: 1.17.0
-- Dart SDK: ^3.5.4
-
-### Installation
-
-Add this to your package's `pubspec.yaml` file:
+## Install
 
 ```yaml
 dependencies:
-  paychangu_flutter: ^0.0.1
+  paychangu_flutter: ^1.0.0
 ```
-
-Then run:
 
 ```bash
 flutter pub get
 ```
 
-## Usage
+## Before you start
 
-### 1. Initialize PayChangu
+1. Create a merchant account and grab a **sandbox secret key** from [API keys](https://developer.paychangu.com/docs/api-keys).
+2. Decide where the secret key lives:
+   - **Hosted checkout** — many apps call `POST /payment` from the device (same pattern as this SDK’s WebView).
+   - **Payouts, card PAN charges, bills** — call these from **your backend**. Do not ship a live secret key in a production mobile binary for those flows.
+3. Always **verify** successful payments with `verifyTransaction` (or your server) before fulfilling an order.
+
+## 5-minute hosted checkout
 
 ```dart
+import 'package:flutter/material.dart';
 import 'package:paychangu_flutter/paychangu_flutter.dart';
 
-final config = PayChanguConfig(
-  secretKey: 'your_secret_key_here',
-  isTestMode: true, // Set to false in production
+final paychangu = PayChangu(
+  PayChanguConfig(
+    secretKey: const String.fromEnvironment('PAYCHANGU_SECRET_KEY'),
+    isTestMode: true,
+  ),
 );
 
-final paychangu = PayChangu(config);
-```
-
-### 2. Create a Payment Request
-
-```dart
 final request = PaymentRequest(
-  txRef: 'unique_transaction_reference',
+  txRef: 'order-${DateTime.now().millisecondsSinceEpoch}',
   firstName: 'John',
   lastName: 'Doe',
   email: 'john@example.com',
   currency: Currency.MWK,
   amount: 1000,
-  callbackUrl: 'https://your-domain.com/callback',
-  returnUrl: 'https://your-domain.com/return',
+  callbackUrl: 'https://your-app.com/callback',
+  returnUrl: 'https://your-app.com/return',
+  customization: const {
+    'title': 'My Shop',
+    'description': 'Order #123',
+  },
+);
+
+// Push a full-screen route:
+Navigator.of(context).push(
+  MaterialPageRoute(
+    builder: (_) => Scaffold(
+      appBar: AppBar(title: const Text('Pay')),
+      body: paychangu.launchPayment(
+        request: request,
+        autoVerify: true,
+        onSuccess: (params) {
+          // Redirect query params — still verify on your server
+        },
+        onError: (error) {},
+        onCancel: () {},
+        onVerified: (verification) {
+          // SDK re-queried GET /verify-payment/{tx_ref}
+        },
+      ),
+    ),
+  ),
 );
 ```
 
-### 3. Launch Payment
+### Verify manually
 
 ```dart
-Widget buildPaymentWidget() {
-  return paychangu.launchPayment(
-    request: request,
-    onSuccess: (response) {
-      print('Payment successful: $response');
-      // Verify the transaction after success
-      verifyTransaction(response['tx_ref']);
-    },
-    onError: (error) {
-      print('Payment failed: $error');
-    },
-    onCancel: () {
-      print('Payment cancelled');
-    },
-  );
-}
+final verification = await paychangu.verifyTransaction(txRef);
+
+final ok = paychangu.validatePayment(
+  verification,
+  expectedTxRef: txRef,
+  expectedCurrency: 'MWK',
+  expectedAmount: 1000,
+);
 ```
 
-### 4. Verify Transaction
-
-Always verify transactions server-side before providing value to your customer:
+## Direct mobile money (no WebView)
 
 ```dart
-Future<void> verifyTransaction(String txRef) async {
-  try {
-    // Verify the transaction
-    final verification = await paychangu.verifyTransaction(txRef);
-    
-    // Validate the payment details
-    final isValid = paychangu.validatePayment(
-      verification,
-      expectedTxRef: txRef,
-      expectedCurrency: 'MWK',
-      expectedAmount: 1000,
-    );
-    
-    if (isValid) {
-      // Payment is valid, provide value to customer
-      print('Payment verified successfully');
-      print('Amount paid: ${verification.data.amount}');
-      print('Payment channel: ${verification.data.authorization.channel}');
-      print('Transaction reference: ${verification.data.txRef}');
-    } else {
-      // Payment validation failed
-      print('Payment validation failed');
-    }
-  } on PayChanguException catch (e) {
-    print('Verification failed: ${e.message}');
-    if (e.details != null) {
-      print('Error details: ${e.details}');
-    }
-  }
-}
+final operators = await paychangu.getMobileMoneyOperators();
+final airtel = operators.data.firstWhere((o) => o.shortCode == 'airtel');
+
+final charge = await paychangu.chargeMobileMoney(
+  MobileMoneyChargeRequest(
+    mobile: '265991234567',
+    mobileMoneyOperatorRefId: airtel.refId!,
+    amount: '500',
+    chargeId: 'charge-${DateTime.now().millisecondsSinceEpoch}',
+  ),
+);
+
+// Customer approves on their phone, then:
+final status = await paychangu.verifyMobileMoneyCharge(charge.data.chargeId!);
 ```
 
-## Complete Example
+## Library map
 
-Here's a complete example implementing payment and verification:
+| Need | Use |
+|------|-----|
+| Hosted checkout | `initiatePayment`, `launchPayment`, `verifyTransaction` |
+| Wallet balance | `getBalance` |
+| MoMo collect | `getMobileMoneyOperators`, `chargeMobileMoney`, `verifyMobileMoneyCharge` |
+| Bank transfer collect | `initializeBankTransfer`, `getBankTransferDetails` |
+| Card (+ 3DS UI) | `chargeCard`, `launch3dsAuth`, `verifyCardCharge`, `refundCardCharge` |
+| MoMo payout | `initiateMobileMoneyPayout`, `getMobileMoneyPayoutDetails` |
+| Bank payout | `getBanks`, `initiateBankPayout`, `getBankPayoutDetails` |
+| Bills / airtime | `getBillers`, `validateBill`, `payBill`, `buyAirtime`, … |
+| Connect | `createConnectLink`, `getConnectUser`, `revokeConnectToken` |
+| US virtual accounts | `createVirtualCustomer`, `createUsAccount`, … |
+| Webhooks (Dart server) | `PayChanguWebhooks.verify` |
+
+Namespaced APIs are also available: `paychangu.checkout`, `.mobileMoney`, `.bankTransfer`, `.card`, `.mobileMoneyPayouts`, `.bankPayouts`, `.bills`, `.connect`, `.virtualAccounts`.
+
+## Configuration
 
 ```dart
-class PaymentScreen extends StatelessWidget {
-  final paychangu = PayChangu(
-    PayChanguConfig(
-      secretKey: 'your_secret_key_here',
-      isTestMode: true,
-    ),
-  );
+PayChanguConfig(
+  secretKey: '…',
+  isTestMode: true, // documentation flag; live/sandbox follows the key
+  baseUrl: 'https://api.paychangu.com', // override for proxies/mocks
+  timeout: Duration(seconds: 30),
+);
 
-  Future<void> _handlePaymentSuccess(Map<String, dynamic> response) async {
-    try {
-      final verification = await paychangu.verifyTransaction(response['tx_ref']);
-      final isValid = paychangu.validatePayment(
-        verification,
-        expectedTxRef: response['tx_ref'],
-        expectedCurrency: 'MWK',
-        expectedAmount: 1000,
-      );
-
-      if (isValid) {
-        // Process successful payment
-        print('Payment verified: ${verification.data.amount} ${verification.data.currency}');
-      }
-    } catch (e) {
-      print('Verification failed: $e');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Payment')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            final request = PaymentRequest(
-              txRef: 'tx-${DateTime.now().millisecondsSinceEpoch}',
-              firstName: 'John',
-              lastName: 'Doe',
-              email: 'john@example.com',
-              currency: Currency.MWK,
-              amount: 1000,
-              callbackUrl: 'https://your-domain.com/callback',
-              returnUrl: 'https://your-domain.com/return',
-            );
-
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => Scaffold(
-                  body: paychangu.launchPayment(
-                    request: request,
-                    onSuccess: _handlePaymentSuccess,
-                    onError: (error) => print('Payment failed: $error'),
-                    onCancel: () => print('Payment cancelled'),
-                  ),
-                ),
-              ),
-            );
-          },
-          child: Text('Pay Now'),
-        ),
-      ),
-    );
-  }
-}
+// Inject a custom http.Client for tests:
+PayChangu(config, httpClient: mockClient);
 ```
 
-## Verification Response Data
-
-The verification response includes detailed transaction information:
+## Webhooks
 
 ```dart
-verification.data.status         // Transaction status
-verification.data.amount        // Amount paid
-verification.data.currency      // Currency used
-verification.data.txRef         // Transaction reference
-verification.data.authorization.channel    // Payment channel used
-verification.data.authorization.provider   // Payment provider
-verification.data.customer      // Customer information
-verification.data.createdAt     // Transaction creation time
+final valid = PayChanguWebhooks.verify(
+  rawBody: rawBodyString,
+  signatureHeader: headers['Signature']!,
+  webhookSecret: dashboardWebhookSecret,
+);
 ```
 
-## Error Handling
-
-The SDK provides a custom `PayChanguException` class for error handling:
+## Error handling
 
 ```dart
 try {
-  final verification = await paychangu.verifyTransaction(txRef);
+  await paychangu.initiatePayment(request);
 } on PayChanguException catch (e) {
-  print('Error: ${e.message}');
-  if (e.details != null) {
-    print('Details: ${e.details}');
-  }
+  // e.message, e.statusCode, e.details, e.cause
 }
 ```
 
-## Additional Information
+## Migration from 0.0.x
 
-- [PayChangu Documentation](https://paychangu.readme.io/reference)
-- [API Reference](https://paychangu.readme.io/reference/level-reference)
-- [Support](https://paychangu.com/support)
+- Version **1.0.0** is breaking.
+- `initiatePayment` returns `PaymentSessionResponse` (not `Map`).
+- MoMo payout fields: `mobile`, `mobileMoneyOperatorRefId`, `chargeId` (replaces `phoneNumber` / `provider` / `reference`).
+- Prefer `initiateMobileMoneyPayout` over deprecated `initiateMobileMoneyTransfer`.
 
-## Contributing
+## Links
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+- [API introduction](https://developer.paychangu.com/reference/introduction)
+- [Standard checkout guide](https://developer.paychangu.com/docs/standard-checkout)
+- [Transaction verification](https://developer.paychangu.com/docs/transaction-verification)
+- [Webhooks](https://developer.paychangu.com/docs/webhooks)
+- [Errors](https://developer.paychangu.com/docs/paychangu-errors)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, email developer@paychangu.com or visit our [support page](https://devs.paychangu.com/support).
+MIT
