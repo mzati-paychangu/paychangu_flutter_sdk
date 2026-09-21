@@ -310,8 +310,9 @@ void main() {
     test('verifies valid HMAC-SHA256 signature', () {
       const body = '{"status":"success"}';
       const secret = 'whsec_test';
-      final signature =
-          Hmac(sha256, utf8.encode(secret)).convert(utf8.encode(body)).toString();
+      final signature = Hmac(sha256, utf8.encode(secret))
+          .convert(utf8.encode(body))
+          .toString();
 
       expect(
         PayChanguWebhooks.verify(

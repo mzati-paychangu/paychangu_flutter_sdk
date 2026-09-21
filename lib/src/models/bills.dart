@@ -4,11 +4,19 @@ import 'common.dart';
 /// Bill payment / airtime request models and resilient responses.
 
 class ValidateBillRequest {
+  /// Biller.
   final String biller;
+
+  /// Account.
   final String account;
+
+  /// Account type.
   final String? accountType;
+
+  /// Amount.
   final String? amount;
 
+  /// Creates a [ValidateBillRequest].
   const ValidateBillRequest({
     required this.biller,
     required this.account,
@@ -16,6 +24,7 @@ class ValidateBillRequest {
     this.amount,
   });
 
+  /// To json.
   Map<String, dynamic> toJson() => {
         'biller': biller,
         'account': account,
@@ -25,13 +34,25 @@ class ValidateBillRequest {
 }
 
 class PayBillRequest {
+  /// Biller.
   final String biller;
+
+  /// Account.
   final String account;
+
+  /// Amount.
   final String? amount;
+
+  /// Customer name.
   final String? customerName;
+
+  /// Account type.
   final String? accountType;
+
+  /// Reference.
   final String? reference;
 
+  /// Creates a [PayBillRequest].
   const PayBillRequest({
     required this.biller,
     required this.account,
@@ -41,6 +62,7 @@ class PayBillRequest {
     this.reference,
   });
 
+  /// To json.
   Map<String, dynamic> toJson() => {
         'biller': biller,
         'account': account,
@@ -52,16 +74,23 @@ class PayBillRequest {
 }
 
 class AirtimeRechargeRequest {
+  /// Phone.
   final String phone;
+
+  /// Amount.
   final String amount;
+
+  /// Reference.
   final String? reference;
 
+  /// Creates a [AirtimeRechargeRequest].
   const AirtimeRechargeRequest({
     required this.phone,
     required this.amount,
     this.reference,
   });
 
+  /// To json.
   Map<String, dynamic> toJson() => {
         'phone': phone,
         'amount': amount,
@@ -71,11 +100,19 @@ class AirtimeRechargeRequest {
 
 /// Generic bills envelope — official schemas are sparse.
 class BillsApiResponse {
+  /// Status.
   final String status;
+
+  /// Message.
   final String message;
+
+  /// Data.
   final dynamic data;
+
+  /// Raw.
   final Map<String, dynamic> raw;
 
+  /// Creates a [BillsApiResponse].
   const BillsApiResponse({
     required this.status,
     required this.message,
@@ -83,6 +120,7 @@ class BillsApiResponse {
     required this.raw,
   });
 
+  /// Parses a [BillsApiResponse] from JSON.
   factory BillsApiResponse.fromJson(Map<String, dynamic> json) {
     return BillsApiResponse(
       status: JsonUtils.asStringRequired(json['status'], 'success'),

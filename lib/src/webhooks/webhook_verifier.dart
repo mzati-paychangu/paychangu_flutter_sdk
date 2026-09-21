@@ -13,8 +13,8 @@ class PayChanguWebhooks {
     required String signatureHeader,
     required String webhookSecret,
   }) {
-    final digest = Hmac(sha256, utf8.encode(webhookSecret))
-        .convert(utf8.encode(rawBody));
+    final digest =
+        Hmac(sha256, utf8.encode(webhookSecret)).convert(utf8.encode(rawBody));
     final computed = digest.toString();
     return _constantTimeEquals(computed, signatureHeader.trim());
   }

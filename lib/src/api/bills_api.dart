@@ -5,6 +5,8 @@ import '../models/bills.dart';
 class BillsApi {
   final PayChanguClient _client;
 
+  /// Creates a [BillsApi] bound to the shared HTTP client.
+
   BillsApi(this._client);
 
   /// `GET /bills/getBillers`
@@ -21,8 +23,7 @@ class BillsApi {
 
   /// `POST /bills/validate`
   Future<BillsApiResponse> validateBill(ValidateBillRequest request) async {
-    final json =
-        await _client.post('/bills/validate', body: request.toJson());
+    final json = await _client.post('/bills/validate', body: request.toJson());
     return BillsApiResponse.fromJson(json);
   }
 

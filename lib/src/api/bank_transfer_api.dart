@@ -6,6 +6,8 @@ import '../models/enums.dart';
 class BankTransferApi {
   final PayChanguClient _client;
 
+  /// Creates a [BankTransferApi] bound to the shared HTTP client.
+
   BankTransferApi(this._client);
 
   /// `POST /direct-charge/payments/initialize`
@@ -31,6 +33,8 @@ class BankTransferApi {
 class PayoutsApi {
   final PayChanguClient _client;
 
+  /// Creates a [PayoutsApi] bound to the shared HTTP client.
+
   PayoutsApi(this._client);
 
   /// `GET /direct-charge/payouts/supported-banks`
@@ -55,8 +59,7 @@ class PayoutsApi {
 
   /// `GET /direct-charge/payouts/{charge_id}/details`
   Future<BankPayoutResponse> getBankPayoutDetails(String chargeId) async {
-    final json =
-        await _client.get('/direct-charge/payouts/$chargeId/details');
+    final json = await _client.get('/direct-charge/payouts/$chargeId/details');
     return BankPayoutResponse.fromJson(json);
   }
 

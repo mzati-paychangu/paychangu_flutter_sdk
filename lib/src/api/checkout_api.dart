@@ -6,15 +6,16 @@ import '../models/payment_request.dart';
 class CheckoutApi {
   final PayChanguClient _client;
 
+  /// Creates a [CheckoutApi] bound to the shared HTTP client.
   CheckoutApi(this._client);
 
-  /// `POST /payment`
+  /// Initiates a hosted payment session (`POST /payment`).
   Future<PaymentSessionResponse> initiatePayment(PaymentRequest request) async {
     final json = await _client.post('/payment', body: request.toJson());
     return PaymentSessionResponse.fromJson(json);
   }
 
-  /// `GET /verify-payment/{tx_ref}`
+  /// Verifies a payment by transaction reference.
   Future<PaymentVerificationResponse> verifyTransaction(String txRef) async {
     final json = await _client.get('/verify-payment/$txRef');
     return PaymentVerificationResponse.fromJson(json);

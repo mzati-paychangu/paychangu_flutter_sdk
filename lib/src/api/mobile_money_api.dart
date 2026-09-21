@@ -7,6 +7,8 @@ import '../models/mobile_money.dart';
 class MobileMoneyApi {
   final PayChanguClient _client;
 
+  /// Creates a [MobileMoneyApi] bound to the shared HTTP client.
+
   MobileMoneyApi(this._client);
 
   /// `GET /mobile-money`
@@ -28,8 +30,7 @@ class MobileMoneyApi {
 
   /// `GET /mobile-money/payments/{chargeId}/verify`
   Future<MobileMoneyTransactionResponse> verifyCharge(String chargeId) async {
-    final json =
-        await _client.get('/mobile-money/payments/$chargeId/verify');
+    final json = await _client.get('/mobile-money/payments/$chargeId/verify');
     return MobileMoneyTransactionResponse.fromJson(json);
   }
 
@@ -37,8 +38,7 @@ class MobileMoneyApi {
   Future<MobileMoneyTransactionResponse> getChargeDetails(
     String chargeId,
   ) async {
-    final json =
-        await _client.get('/mobile-money/payments/$chargeId/details');
+    final json = await _client.get('/mobile-money/payments/$chargeId/details');
     return MobileMoneyTransactionResponse.fromJson(json);
   }
 

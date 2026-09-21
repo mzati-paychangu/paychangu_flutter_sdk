@@ -3,15 +3,31 @@ import 'common.dart';
 
 /// Mobile money operator from `GET /mobile-money`.
 class MobileMoneyOperator {
+  /// Id.
   final int? id;
+
+  /// Name.
   final String? name;
+
+  /// Ref id.
   final String? refId;
+
+  /// Short code.
   final String? shortCode;
+
+  /// Logo.
   final String? logo;
+
+  /// Supports withdrawals.
   final bool? supportsWithdrawals;
+
+  /// Country name.
   final String? countryName;
+
+  /// Country currency.
   final String? countryCurrency;
 
+  /// Creates a [MobileMoneyOperator].
   const MobileMoneyOperator({
     this.id,
     this.name,
@@ -23,6 +39,7 @@ class MobileMoneyOperator {
     this.countryCurrency,
   });
 
+  /// Parses a [MobileMoneyOperator] from JSON.
   factory MobileMoneyOperator.fromJson(Map<String, dynamic> json) {
     final country = JsonUtils.asMap(json['supported_country']);
     return MobileMoneyOperator(
@@ -39,23 +56,31 @@ class MobileMoneyOperator {
 }
 
 class MobileMoneyOperatorsResponse {
+  /// Status.
   final String status;
+
+  /// Message.
   final String message;
+
+  /// Data.
   final List<MobileMoneyOperator> data;
 
+  /// Creates a [MobileMoneyOperatorsResponse].
   const MobileMoneyOperatorsResponse({
     required this.status,
     required this.message,
     required this.data,
   });
 
+  /// Parses a [MobileMoneyOperatorsResponse] from JSON.
   factory MobileMoneyOperatorsResponse.fromJson(Map<String, dynamic> json) {
     return MobileMoneyOperatorsResponse(
       status: JsonUtils.asStringRequired(json['status']),
       message: JsonUtils.asStringRequired(json['message']),
       data: JsonUtils.asList(json['data'])
           .whereType<Map>()
-          .map((e) => MobileMoneyOperator.fromJson(Map<String, dynamic>.from(e)))
+          .map(
+              (e) => MobileMoneyOperator.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
     );
   }
@@ -63,14 +88,28 @@ class MobileMoneyOperatorsResponse {
 
 /// Direct MoMo charge request (`POST /mobile-money/payments/initialize`).
 class MobileMoneyChargeRequest {
+  /// Mobile.
   final String mobile;
+
+  /// Mobile money operator ref id.
   final String mobileMoneyOperatorRefId;
+
+  /// Amount.
   final String amount;
+
+  /// Charge id.
   final String chargeId;
+
+  /// Email.
   final String? email;
+
+  /// First name.
   final String? firstName;
+
+  /// Last name.
   final String? lastName;
 
+  /// Creates a [MobileMoneyChargeRequest].
   const MobileMoneyChargeRequest({
     required this.mobile,
     required this.mobileMoneyOperatorRefId,
@@ -81,6 +120,7 @@ class MobileMoneyChargeRequest {
     this.lastName,
   });
 
+  /// To json.
   Map<String, dynamic> toJson() => {
         'mobile': mobile,
         'mobile_money_operator_ref_id': mobileMoneyOperatorRefId,
@@ -94,17 +134,31 @@ class MobileMoneyChargeRequest {
 
 /// MoMo payout request (`POST /mobile-money/payouts/initialize`).
 class MobileMoneyPayoutRequest {
+  /// Mobile.
   final String mobile;
+
+  /// Mobile money operator ref id.
   final String mobileMoneyOperatorRefId;
+
+  /// Amount.
   final String amount;
+
+  /// Charge id.
   final String chargeId;
+
+  /// Email.
   final String? email;
+
+  /// First name.
   final String? firstName;
+
+  /// Last name.
   final String? lastName;
 
   /// Sandbox only: `successful` or `failed`.
   final String? transactionStatus;
 
+  /// Creates a [MobileMoneyPayoutRequest].
   const MobileMoneyPayoutRequest({
     required this.mobile,
     required this.mobileMoneyOperatorRefId,
@@ -116,6 +170,7 @@ class MobileMoneyPayoutRequest {
     this.transactionStatus,
   });
 
+  /// To json.
   Map<String, dynamic> toJson() => {
         'mobile': mobile,
         'mobile_money_operator_ref_id': mobileMoneyOperatorRefId,
@@ -130,28 +185,70 @@ class MobileMoneyPayoutRequest {
 
 /// Shared charge/payout transaction payload for mobile money.
 class MobileMoneyTransaction {
+  /// Amount.
   final num? amount;
+
+  /// Charge id.
   final String? chargeId;
+
+  /// Ref id.
   final String? refId;
+
+  /// Trans id.
   final String? transId;
+
+  /// First name.
   final String? firstName;
+
+  /// Last name.
   final String? lastName;
+
+  /// Email.
   final String? email;
+
+  /// Type.
   final String? type;
+
+  /// Trace id.
   final String? traceId;
+
+  /// Status.
   final String? status;
+
+  /// Mobile.
   final String? mobile;
+
+  /// Attempts.
   final int? attempts;
+
+  /// Currency.
   final String? currency;
+
+  /// Mode.
   final String? mode;
+
+  /// Created at.
   final String? createdAt;
+
+  /// Completed at.
   final String? completedAt;
+
+  /// Event type.
   final String? eventType;
+
+  /// Mobile money.
   final MobileMoneyInfo? mobileMoney;
+
+  /// Transaction charges.
   final TransactionCharges? transactionCharges;
+
+  /// Authorization.
   final AuthorizationData? authorization;
+
+  /// Logs.
   final List<LogEntry> logs;
 
+  /// Creates a [MobileMoneyTransaction].
   const MobileMoneyTransaction({
     this.amount,
     this.chargeId,
@@ -176,9 +273,11 @@ class MobileMoneyTransaction {
     this.logs = const [],
   });
 
+  /// Parses a [MobileMoneyTransaction] from JSON.
   factory MobileMoneyTransaction.fromJson(Map<String, dynamic> json) {
     return MobileMoneyTransaction(
-      amount: JsonUtils.asDouble(json['amount']) ?? JsonUtils.asInt(json['amount']),
+      amount:
+          JsonUtils.asDouble(json['amount']) ?? JsonUtils.asInt(json['amount']),
       chargeId: JsonUtils.asString(json['charge_id']),
       refId: JsonUtils.asString(json['ref_id']),
       transId: JsonUtils.asString(json['trans_id']),
@@ -215,21 +314,29 @@ class MobileMoneyTransaction {
 }
 
 class MobileMoneyTransactionResponse {
+  /// Status.
   final String status;
+
+  /// Message.
   final String message;
+
+  /// Data.
   final MobileMoneyTransaction data;
 
+  /// Creates a [MobileMoneyTransactionResponse].
   const MobileMoneyTransactionResponse({
     required this.status,
     required this.message,
     required this.data,
   });
 
+  /// Parses a [MobileMoneyTransactionResponse] from JSON.
   factory MobileMoneyTransactionResponse.fromJson(Map<String, dynamic> json) {
     return MobileMoneyTransactionResponse(
       status: JsonUtils.asStringRequired(json['status']),
       message: JsonUtils.asStringRequired(json['message']),
-      data: MobileMoneyTransaction.fromJson(JsonUtils.asMap(json['data']) ?? {}),
+      data:
+          MobileMoneyTransaction.fromJson(JsonUtils.asMap(json['data']) ?? {}),
     );
   }
 }

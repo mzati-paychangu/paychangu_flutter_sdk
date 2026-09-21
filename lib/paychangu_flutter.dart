@@ -1,3 +1,17 @@
+/// Flutter/Dart client for the [PayChangu](https://developer.paychangu.com) API.
+///
+/// Use [PayChangu] as the main entry point for hosted checkout, direct charges,
+/// payouts, bills, Connect, and virtual accounts.
+///
+/// ```dart
+/// import 'package:paychangu_flutter/paychangu_flutter.dart';
+///
+/// final paychangu = PayChangu(
+///   PayChanguConfig(secretKey: 'sec-test-...'),
+/// );
+/// ```
+library;
+
 export 'src/config/paychangu_config.dart';
 export 'src/core/paychangu.dart';
 export 'src/core/paychangu_client.dart';
