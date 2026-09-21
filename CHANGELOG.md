@@ -1,3 +1,9 @@
+## 1.1.0
+
+- Expanded README with usage examples for all supported APIs.
+- Pub score readiness: metadata, MIT license recognition, minimal `example/`,
+  public API docs, and analyzer cleanup (`Currency.MWK` / `USD` kept).
+
 ## 1.0.0
 
 Breaking rewrite aligned with the current PayChangu API
