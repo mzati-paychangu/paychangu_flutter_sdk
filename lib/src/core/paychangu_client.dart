@@ -8,10 +8,12 @@ import '../exceptions/paychangu_exception.dart';
 
 /// Low-level HTTP client for PayChangu REST APIs.
 class PayChanguClient {
+  /// Active SDK configuration (base URL, key, timeout).
   final PayChanguConfig config;
   final http.Client _httpClient;
   final bool _ownsClient;
 
+  /// Creates a client. Pass [httpClient] to inject mocks in tests.
   PayChanguClient({
     required this.config,
     http.Client? httpClient,
@@ -31,6 +33,7 @@ class PayChanguClient {
     );
   }
 
+  /// Performs an authenticated GET and returns decoded JSON.
   Future<Map<String, dynamic>> get(
     String path, {
     Map<String, String>? query,
@@ -38,6 +41,7 @@ class PayChanguClient {
     return _send(() => _httpClient.get(_uri(path, query), headers: _headers));
   }
 
+  /// Performs an authenticated POST and returns decoded JSON.
   Future<Map<String, dynamic>> post(
     String path, {
     Map<String, dynamic>? body,
@@ -52,6 +56,7 @@ class PayChanguClient {
     );
   }
 
+  /// Performs an authenticated PUT and returns decoded JSON.
   Future<Map<String, dynamic>> put(
     String path, {
     Map<String, dynamic>? body,
@@ -66,6 +71,7 @@ class PayChanguClient {
     );
   }
 
+  /// Performs an authenticated DELETE and returns decoded JSON.
   Future<Map<String, dynamic>> delete(
     String path, {
     Map<String, String>? query,
@@ -126,6 +132,7 @@ class PayChanguClient {
     return json ?? <String, dynamic>{};
   }
 
+  /// Closes the underlying HTTP client when this instance owns it.
   void close() {
     if (_ownsClient) {
       _httpClient.close();

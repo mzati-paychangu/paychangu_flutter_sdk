@@ -3,9 +3,9 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
     - build/**
-    - android/**
-    - ios/**
-    - web/**
-    - windows/**
-    - macos/**
-    - linux/**
+    - example/build/**
+
+linter:
+  rules:
+    # Currency ISO codes (MWK, USD) are intentional public API names.
+    constant_identifier_names: false

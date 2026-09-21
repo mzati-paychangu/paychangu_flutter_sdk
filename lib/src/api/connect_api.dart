@@ -6,6 +6,8 @@ import '../models/connect_virtual.dart';
 class ConnectApi {
   final PayChanguClient _client;
 
+  /// Creates a [ConnectApi] bound to the shared HTTP client.
+
   ConnectApi(this._client);
 
   /// `POST /connect/authorize-link`

@@ -5,7 +5,7 @@ class PayChanguConfig {
   /// Prefer keeping this on your server for payouts, card charges, and bills.
   final String secretKey;
 
-  /// When true, documents sandbox usage. Live vs sandbox is determined by the key.
+  /// When `true`, documents sandbox usage. Live vs sandbox is determined by the key.
   final bool isTestMode;
 
   /// API base URL. Override for mocking or proxies.
@@ -14,6 +14,7 @@ class PayChanguConfig {
   /// HTTP request timeout.
   final Duration timeout;
 
+  /// Creates SDK configuration.
   const PayChanguConfig({
     required this.secretKey,
     this.isTestMode = false,

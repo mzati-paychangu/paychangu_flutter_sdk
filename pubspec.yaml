@@ -1,8 +1,11 @@
 name: paychangu_flutter
-description: "A Flutter SDK for integrating PayChangu payment gateway. Supports hosted checkout, direct mobile money, bank transfer, cards, payouts, bills, Connect, and US virtual accounts."
+description: >-
+  Flutter SDK for the PayChangu payment gateway. Hosted checkout, mobile money,
+  bank transfer, cards, payouts, bills, Connect, and US virtual accounts.
 version: 1.0.0
-homepage: https://github.com/paychangu/paychangu-flutter
-repository: https://github.com/paychangu/paychangu-flutter
+homepage: https://github.com/OnionsMakeYouCry/paychangu_flutter
+repository: https://github.com/OnionsMakeYouCry/paychangu_flutter
+issue_tracker: https://github.com/OnionsMakeYouCry/paychangu_flutter/issues
 documentation: https://developer.paychangu.com
 
 environment:

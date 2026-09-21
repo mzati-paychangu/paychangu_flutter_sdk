@@ -6,6 +6,8 @@ import '../models/connect_virtual.dart';
 class VirtualAccountsApi {
   final PayChanguClient _client;
 
+  /// Creates a [VirtualAccountsApi] bound to the shared HTTP client.
+
   VirtualAccountsApi(this._client);
 
   /// `POST /virtual-account/api/customers/create`

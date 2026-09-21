@@ -7,14 +7,28 @@ import '../models/payment_request.dart';
 
 /// WebView widget for hosted PayChangu checkout.
 class PayChanguWebView extends StatefulWidget {
+  /// Request.
   final PaymentRequest request;
+
+  /// Paychangu.
   final PayChangu paychangu;
+
+  /// On success.
   final void Function(Map<String, dynamic> params) onSuccess;
+
+  /// On error.
   final void Function(String error) onError;
+
+  /// On cancel.
   final void Function() onCancel;
+
+  /// Auto verify.
   final bool autoVerify;
+
+  /// On verified.
   final void Function(PaymentVerificationResponse verification)? onVerified;
 
+  /// Creates a [PayChanguWebView].
   const PayChanguWebView({
     super.key,
     required this.request,
@@ -36,6 +50,8 @@ class _PayChanguWebViewState extends State<PayChanguWebView> {
   String? _error;
 
   @override
+
+  /// Init state.
   void initState() {
     super.initState();
     _controller = WebViewController()
@@ -74,8 +90,7 @@ class _PayChanguWebViewState extends State<PayChanguWebView> {
 
   Future<void> _initializePayment() async {
     try {
-      final response =
-          await widget.paychangu.initiatePayment(widget.request);
+      final response = await widget.paychangu.initiatePayment(widget.request);
       await _controller.loadRequest(Uri.parse(response.data.checkoutUrl));
     } catch (e) {
       if (mounted) {
@@ -126,6 +141,8 @@ class _PayChanguWebViewState extends State<PayChanguWebView> {
   }
 
   @override
+
+  /// Build.
   Widget build(BuildContext context) {
     if (_error != null) {
       return Center(
@@ -142,8 +159,7 @@ class _PayChanguWebViewState extends State<PayChanguWebView> {
     return Stack(
       children: [
         WebViewWidget(controller: _controller),
-        if (_loading)
-          const Center(child: CircularProgressIndicator()),
+        if (_loading) const Center(child: CircularProgressIndicator()),
       ],
     );
   }
@@ -151,11 +167,19 @@ class _PayChanguWebViewState extends State<PayChanguWebView> {
 
 /// WebView for card 3DS authentication.
 class PayChangu3dsWebView extends StatefulWidget {
+  /// Auth url.
   final String authUrl;
+
+  /// Redirect url.
   final String redirectUrl;
+
+  /// On complete.
   final void Function(Map<String, dynamic> params) onComplete;
+
+  /// On error.
   final void Function(String error) onError;
 
+  /// Creates a [PayChangu3dsWebView].
   const PayChangu3dsWebView({
     super.key,
     required this.authUrl,
@@ -173,6 +197,8 @@ class _PayChangu3dsWebViewState extends State<PayChangu3dsWebView> {
   var _loading = true;
 
   @override
+
+  /// Init state.
   void initState() {
     super.initState();
     _controller = WebViewController()
@@ -182,7 +208,8 @@ class _PayChangu3dsWebViewState extends State<PayChangu3dsWebView> {
           onNavigationRequest: (request) {
             if (request.url.startsWith(widget.redirectUrl)) {
               widget.onComplete(
-                Map<String, dynamic>.from(Uri.parse(request.url).queryParameters),
+                Map<String, dynamic>.from(
+                    Uri.parse(request.url).queryParameters),
               );
               return NavigationDecision.prevent;
             }
@@ -198,6 +225,8 @@ class _PayChangu3dsWebViewState extends State<PayChangu3dsWebView> {
   }
 
   @override
+
+  /// Build.
   Widget build(BuildContext context) {
     return Stack(
       children: [

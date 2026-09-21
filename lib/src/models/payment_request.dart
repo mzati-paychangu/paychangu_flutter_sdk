@@ -2,18 +2,40 @@ import 'enums.dart';
 
 /// Hosted checkout payment request (`POST /payment`).
 class PaymentRequest {
+  /// Merchant transaction reference (must be unique when provided).
   final String? txRef;
+
+  /// Customer first name.
   final String? firstName;
+
+  /// Customer last name.
   final String? lastName;
+
+  /// Customer email for receipts.
   final String? email;
+
+  /// Charge currency.
   final Currency currency;
+
+  /// Amount to charge.
   final num amount;
+
+  /// Success / IPN redirect URL.
   final String callbackUrl;
+
+  /// Cancel / failure return URL.
   final String returnUrl;
+
+  /// Optional checkout title/description customization.
   final Map<String, String>? customization;
+
+  /// Optional merchant metadata.
   final dynamic meta;
+
+  /// Optional UUID passthrough.
   final String? uuid;
 
+  /// Creates a hosted checkout request.
   PaymentRequest({
     this.txRef,
     this.firstName,
@@ -28,6 +50,7 @@ class PaymentRequest {
     this.uuid,
   });
 
+  /// Serializes the request for `POST /payment`.
   Map<String, dynamic> toJson() {
     return {
       'amount': amount.toString(),

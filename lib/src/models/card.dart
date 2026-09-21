@@ -5,16 +5,34 @@ import 'enums.dart';
 ///
 /// Prefer calling this from your server — card PAN data is PCI-sensitive.
 class CardChargeRequest {
+  /// Card number.
   final String cardNumber;
+
+  /// Expiry.
   final String expiry;
+
+  /// Cvv.
   final String cvv;
+
+  /// Cardholder name.
   final String cardholderName;
+
+  /// Amount.
   final String amount;
+
+  /// Currency.
   final Currency currency;
+
+  /// Charge id.
   final String chargeId;
+
+  /// Redirect url.
   final String redirectUrl;
+
+  /// Email.
   final String? email;
 
+  /// Creates a [CardChargeRequest].
   const CardChargeRequest({
     required this.cardNumber,
     required this.expiry,
@@ -27,6 +45,7 @@ class CardChargeRequest {
     this.email,
   });
 
+  /// To json.
   Map<String, dynamic> toJson() => {
         'card_number': cardNumber,
         'expiry': expiry,
@@ -41,12 +60,22 @@ class CardChargeRequest {
 }
 
 class CardChargeResponse {
+  /// Success.
   final bool success;
+
+  /// Requires3ds auth.
   final bool requires3dsAuth;
+
+  /// Order reference.
   final String? orderReference;
+
+  /// Three ds auth link.
   final String? threeDsAuthLink;
+
+  /// Raw.
   final Map<String, dynamic> raw;
 
+  /// Creates a [CardChargeResponse].
   const CardChargeResponse({
     required this.success,
     required this.requires3dsAuth,
@@ -55,6 +84,7 @@ class CardChargeResponse {
     required this.raw,
   });
 
+  /// Parses a [CardChargeResponse] from JSON.
   factory CardChargeResponse.fromJson(Map<String, dynamic> json) {
     return CardChargeResponse(
       success: JsonUtils.asBool(json['success']) ??

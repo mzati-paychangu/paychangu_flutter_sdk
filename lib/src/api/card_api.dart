@@ -6,6 +6,8 @@ import '../models/common.dart';
 class CardApi {
   final PayChanguClient _client;
 
+  /// Creates a [CardApi] bound to the shared HTTP client.
+
   CardApi(this._client);
 
   /// `POST /charge-card/payments`
